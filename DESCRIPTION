@@ -1,0 +1,17 @@
+Package: nonnet
+Title: Generate and Analyze Nonlinear Networks
+Version: 1.0.0
+Authors@R: c(
+    person("Lindley", "Slipetz", email = "ddj6tu@virginia.edu",
+           role = c("aut", "cre"))
+    )
+Maintainer: Lindley Slipetz <ddj6tu@virginia.edu>
+Description: Use the netgen function to generate a nonlinear network and the dcor_res function for a residualization procedure for detecting nonlinear relations.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports:
+    energy,
+    mgcv,
+    stats
+Config/roxygen2/version: 8.1.0
