@@ -28,3 +28,9 @@ Residualizes two random variables with respect to a set of covariates using
 generalized additive models, then tests the association between the
 residualized variables using a permutation-based distance correlation test.
 }
+\examples{
+dat <- data.frame("A" = c(2,3,4), "C" = c(4,9,16), "B" = c(1,1,1), "D" = c(1,1,1))
+res <- dcor_res(dat, "A", "C", c("B", "D"), 1000)
+res
+
+}

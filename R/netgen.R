@@ -1,15 +1,7 @@
 #' Generate Simulated Nonlinear Network Data
 #'
 #' Simulates a dataset containing a central variable, peripheral variables,
-#' and a target variable under different functional relationships. The
-#' relationship between the central variable and the target can be linear,
-#' quadratic, interaction, or logarithmic. Peripheral variables can
-#' also be generated according to linear, quadratic, interaction, or
-#' logarithmic relationships with the central variable.
-#'
-#' The function returns the simulated central variable `A`, target variable
-#' `C`, peripheral linear variables named `B1`, `B2`, ..., and peripheral
-#' nonlinear variables named `D1`, `D2`, ....
+#' and a target variable under different functional relationships.
 #'
 #' @param n Integer. Number of observations to generate.
 #' @param mean_cent Mean of the central variable `A`.
@@ -21,21 +13,48 @@
 #' @param mean_target Mean of the random error term for the target variable `C`.
 #' @param sd_target Standard deviation of the random error term for the target variable `C`.
 #' @param beta_peri_lin Numeric vector. Regression coefficients for effects of the peripheral linear variables on `C`.
-#' @param beta_cent_lin Numeric vector. Regression coefficients for effects of the central variable `A` on the peripheral linear variables.
-#' @param beta_lin Coefficient for the linear effect of `A` on the target variable `C`.
+#' @param beta_cent_lin Numeric vector. Regression coefficients for effects of `A` on the peripheral linear variables.
+#' @param beta_lin Coefficient for the linear effect of `A` on `C`.
 #' @param beta_non Coefficient for the nonlinear effect of `A` on `C`.
 #' @param beta_cent_non Numeric vector. Regression coefficients for effects of `A` on the peripheral nonlinear variables.
 #' @param beta_peri_non Numeric vector. Regression coefficients for effects of the peripheral nonlinear variables on `C`.
 #' @param inter_cent_lin Integer vector. Indices identifying peripheral variables involved in interactions with `A`.
 #' @param beta_con Regression coefficient for the confounding effect.
-#' @param func Character. Functional form relating `A` to `C`. One of `"linear"`, `"quad"`, `"inter"`, or `"log"`.
-#' @param con_func Character. Functional form relating `A` to the peripheral nonlinear variables. One of `"linear"`, `"quad"`, `"inter"`, or `"log"`.
+#' @param func Character. Functional form relating `A` to `C`.
+#' @param con_func Character. Functional form relating `A` to the nonlinear peripheral variables.
 #'
-#' @return A data frame containing the central variable `A`, target variable
-#'   `C`, peripheral linear variables `B1`, `B2`, ..., and peripheral
-#'   nonlinear variables `D1`, `D2`, ....
+#' @return A data frame containing `A`, `C`, linear peripheral variables
+#'   `B1`, `B2`, ..., and nonlinear peripheral variables `D1`, `D2`, ....
+#'
+#' @examples
+#' set.seed(123)
+#'
+#' dat <- netgen(
+#'   n = 100,
+#'   mean_cent = 0,
+#'   sd_cent = 1,
+#'   mean_peri_non = rep(0, 4),
+#'   mean_peri_lin = rep(0, 3),
+#'   sd_peri_non = rep(1, 4),
+#'   sd_peri_lin = rep(1, 3),
+#'   mean_target = 0,
+#'   sd_target = 1,
+#'   beta_peri_lin = c(0.3, 0.4, 0.5),
+#'   beta_cent_lin = rep(0.5, 3),
+#'   beta_lin = 0.5,
+#'   beta_non = 0.75,
+#'   beta_cent_non = c(0.5, 0.6, 0.7, 0.8),
+#'   beta_peri_non = c(0.3, 0.4, 0.5, 0.6),
+#'   inter_cent_lin = c(1, 2, 3),
+#'   beta_con = 0,
+#'   func = "quad",
+#'   con_func = "quad"
+#' )
+#'
+#' head(dat)
 #'
 #' @export
+
 
 netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_non,
                    sd_peri_lin, mean_target, sd_target,
@@ -57,10 +76,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
       }
       C <- beta_non*A^2 + beta_lin*A + stats::rnorm(n, mean_target, sd_target)
       for(k in 1:ncol(peri_lin)){
-        C =+ beta_peri_lin[k]*peri_lin[k]
+        C = C + beta_peri_lin[k]*peri_lin[k]
       }
       for(l in 1:ncol(peri_non)){
-        C=+ beta_peri_non[l]*peri_non[l]
+        C= C + beta_peri_non[l]*peri_non[l]
       }
     } else if(con_func == "quad"){
       peri_non <- data.frame(matrix(NA, nrow = n, ncol = length(mean_peri_non)))
@@ -73,10 +92,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
       }
       C <- beta_non*A^2 + beta_lin*A + stats::rnorm(n, mean_target, sd_target)
       for(k in 1:ncol(peri_lin)){
-        C =+ beta_peri_lin[k]*peri_lin[k]
+        C = C + beta_peri_lin[k]*peri_lin[k]
       }
       for(l in 1:ncol(peri_non)){
-        C=+ beta_peri_non[l]*peri_non[l]
+        C= C + beta_peri_non[l]*peri_non[l]
       } } else if(con_func == "inter"){
         peri_lin <- data.frame(matrix(NA, nrow = n, ncol = length(mean_peri_lin)))
         for(j in 1:length(mean_peri_lin)){
@@ -110,10 +129,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
         }
         C <- beta_non*A^2 + beta_lin*A + stats::rnorm(n, mean_target, sd_target)
         for(k in 1:ncol(peri_lin)){
-          C =+ beta_peri_lin[k]*peri_lin[k]
+          C = C + beta_peri_lin[k]*peri_lin[k]
         }
         for(l in 1:ncol(peri_non)){
-          C=+ beta_peri_non[l]*peri_non[l]
+          C= C + beta_peri_non[l]*peri_non[l]
         }
       }
   }
@@ -129,10 +148,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
       }
       C <- beta_lin*A + + stats::rnorm(n, mean_target, sd_target)
       for(m in 1:length(inter_cent_lin)){
-        C =+ beta_non[inter_cent_lin[m]]*A*peri_lin[inter_cent_lin[m]]
+        C = C + beta_non[inter_cent_lin[m]]*A*peri_lin[inter_cent_lin[m]]
       }
       for(l in 1:ncol(peri_non)){
-        C=+ beta_peri_non[l]*peri_non[l]
+        C= C + beta_peri_non[l]*peri_non[l]
       }
     } else if(con_func == "quad"){
       peri_non <- data.frame(matrix(NA, nrow = n, ncol = length(mean_peri_non)))
@@ -145,10 +164,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
       }
       C <- beta_lin*A + + stats::rnorm(n, mean_target, sd_target)
       for(m in 1:length(inter_cent_lin)){
-        C =+ beta_non[inter_cent_lin[m]]*A*peri_lin[inter_cent_lin[m]]
+        C = C + beta_non[inter_cent_lin[m]]*A*peri_lin[inter_cent_lin[m]]
       }
       for(l in 1:ncol(peri_non)){
-        C=+ beta_peri_non[l]*peri_non[l]
+        C= C + beta_peri_non[l]*peri_non[l]
       }} else if(con_func == "inter"){
         peri_lin <- data.frame(matrix(NA, nrow = n, ncol = length(mean_peri_lin)))
         for(j in 1:length(mean_peri_lin)){
@@ -182,10 +201,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
         }
         C <- beta_lin*A + + stats::rnorm(n, mean_target, sd_target)
         for(m in 1:length(inter_cent_lin)){
-          C =+ beta_non[inter_cent_lin[m]]*A*peri_lin[inter_cent_lin[m]]
+          C = C + beta_non[inter_cent_lin[m]]*A*peri_lin[inter_cent_lin[m]]
         }
         for(l in 1:ncol(peri_non)){
-          C=+ beta_peri_non[l]*peri_non[l]
+          C= C + beta_peri_non[l]*peri_non[l]
         }}
 
   }
@@ -201,10 +220,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
       }
       C <- beta_non*A + beta_lin*A + stats::rnorm(n, mean_target, sd_target)
       for(k in 1:ncol(peri_lin)){
-        C =+ beta_peri_lin[k]*peri_lin[k]
+        C = C + beta_peri_lin[k]*peri_lin[k]
       }
       for(l in 1:ncol(peri_non)){
-        C=+ beta_peri_non[l]*peri_non[l]
+        C= C + beta_peri_non[l]*peri_non[l]
       }} else if(con_func == "quad"){
         peri_non <- data.frame(matrix(NA, nrow = n, ncol = length(mean_peri_non)))
         for(i in 1:length(mean_peri_non)){
@@ -216,10 +235,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
         }
         C <- beta_non*A + beta_lin*A + stats::rnorm(n, mean_target, sd_target)
         for(k in 1:ncol(peri_lin)){
-          C =+ beta_peri_lin[k]*peri_lin[k]
+          C = C + beta_peri_lin[k]*peri_lin[k]
         }
         for(l in 1:ncol(peri_non)){
-          C=+ beta_peri_non[l]*peri_non[l]
+          C= C + beta_peri_non[l]*peri_non[l]
         }} else if(con_func == "inter"){
           peri_lin <- data.frame(matrix(NA, nrow = n, ncol = length(mean_peri_lin)))
           for(j in 1:length(mean_peri_lin)){
@@ -253,10 +272,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
           }
           C <- beta_non*A + beta_lin*A + stats::rnorm(n, mean_target, sd_target)
           for(k in 1:ncol(peri_lin)){
-            C =+ beta_peri_lin[k]*peri_lin[k]
+            C = C + beta_peri_lin[k]*peri_lin[k]
           }
           for(l in 1:ncol(peri_non)){
-            C=+ beta_peri_non[l]*peri_non[l]
+            C= C + beta_peri_non[l]*peri_non[l]
           }}
   }
   else if(func == "log"){
@@ -271,10 +290,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
       }
       C <- beta_non*log(abs(A)) + beta_lin*A + stats::rnorm(n, mean_target, sd_target)
       for(k in 1:ncol(peri_lin)){
-        C =+ beta_peri_lin[k]*peri_lin[k]
+        C = C + beta_peri_lin[k]*peri_lin[k]
       }
       for(l in 1:ncol(peri_non)){
-        C=+ beta_peri_non[l]*peri_non[l]
+        C= C + beta_peri_non[l]*peri_non[l]
       }} else if(con_func == "quad"){
         peri_non <- data.frame(matrix(NA, nrow = n, ncol = length(mean_peri_non)))
         for(i in 1:length(mean_peri_non)){
@@ -286,10 +305,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
         }
         C <- beta_non*log(abs(A)) + beta_lin*A + stats::rnorm(n, mean_target, sd_target)
         for(k in 1:ncol(peri_lin)){
-          C =+ beta_peri_lin[k]*peri_lin[k]
+          C = C + beta_peri_lin[k]*peri_lin[k]
         }
         for(l in 1:ncol(peri_non)){
-          C=+ beta_peri_non[l]*peri_non[l]
+          C= C + beta_peri_non[l]*peri_non[l]
         }} else if(con_func == "inter"){
           peri_lin <- data.frame(matrix(NA, nrow = n, ncol = length(mean_peri_lin)))
           for(j in 1:length(mean_peri_lin)){
@@ -324,10 +343,10 @@ netgen <- function(n, mean_cent, sd_cent, mean_peri_non, mean_peri_lin, sd_peri_
           }
           C <- beta_non*log(abs(A)) + beta_lin*A + stats::rnorm(n, mean_target, sd_target)
           for(k in 1:ncol(peri_lin)){
-            C =+ beta_peri_lin[k]*peri_lin[k]
+            C = C + beta_peri_lin[k]*peri_lin[k]
           }
           for(l in 1:ncol(peri_non)){
-            C=+ beta_peri_non[l]*peri_non[l]
+            C= C + beta_peri_non[l]*peri_non[l]
           }}
   }
   colnames(peri_lin) <- paste0("B", 1:length(mean_peri_lin))

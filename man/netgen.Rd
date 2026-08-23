@@ -47,9 +47,9 @@ netgen(
 
 \item{beta_peri_lin}{Numeric vector. Regression coefficients for effects of the peripheral linear variables on \code{C}.}
 
-\item{beta_cent_lin}{Numeric vector. Regression coefficients for effects of the central variable \code{A} on the peripheral linear variables.}
+\item{beta_cent_lin}{Numeric vector. Regression coefficients for effects of \code{A} on the peripheral linear variables.}
 
-\item{beta_lin}{Coefficient for the linear effect of \code{A} on the target variable \code{C}.}
+\item{beta_lin}{Coefficient for the linear effect of \code{A} on \code{C}.}
 
 \item{beta_non}{Coefficient for the nonlinear effect of \code{A} on \code{C}.}
 
@@ -61,25 +61,43 @@ netgen(
 
 \item{beta_con}{Regression coefficient for the confounding effect.}
 
-\item{func}{Character. Functional form relating \code{A} to \code{C}. One of \code{"linear"}, \code{"quad"}, \code{"inter"}, or \code{"log"}.}
+\item{func}{Character. Functional form relating \code{A} to \code{C}.}
 
-\item{con_func}{Character. Functional form relating \code{A} to the peripheral nonlinear variables. One of \code{"linear"}, \code{"quad"}, \code{"inter"}, or \code{"log"}.}
+\item{con_func}{Character. Functional form relating \code{A} to the nonlinear peripheral variables.}
 }
 \value{
-A data frame containing the central variable \code{A}, target variable
-\code{C}, peripheral linear variables \code{B1}, \code{B2}, ..., and peripheral
-nonlinear variables \code{D1}, \code{D2}, ....
+A data frame containing \code{A}, \code{C}, linear peripheral variables
+\code{B1}, \code{B2}, ..., and nonlinear peripheral variables \code{D1}, \code{D2}, ....
 }
 \description{
 Simulates a dataset containing a central variable, peripheral variables,
-and a target variable under different functional relationships. The
-relationship between the central variable and the target can be linear,
-quadratic, interaction, or logarithmic. Peripheral variables can
-also be generated according to linear, quadratic, interaction, or
-logarithmic relationships with the central variable.
+and a target variable under different functional relationships.
 }
-\details{
-The function returns the simulated central variable \code{A}, target variable
-\code{C}, peripheral linear variables named \code{B1}, \code{B2}, ..., and peripheral
-nonlinear variables named \code{D1}, \code{D2}, ....
+\examples{
+set.seed(123)
+
+dat <- netgen(
+  n = 100,
+  mean_cent = 0,
+  sd_cent = 1,
+  mean_peri_non = rep(0, 4),
+  mean_peri_lin = rep(0, 3),
+  sd_peri_non = rep(1, 4),
+  sd_peri_lin = rep(1, 3),
+  mean_target = 0,
+  sd_target = 1,
+  beta_peri_lin = c(0.3, 0.4, 0.5),
+  beta_cent_lin = rep(0.5, 3),
+  beta_lin = 0.5,
+  beta_non = 0.75,
+  beta_cent_non = c(0.5, 0.6, 0.7, 0.8),
+  beta_peri_non = c(0.3, 0.4, 0.5, 0.6),
+  inter_cent_lin = c(1, 2, 3),
+  beta_con = 0,
+  func = "quad",
+  con_func = "quad"
+)
+
+head(dat)
+
 }
